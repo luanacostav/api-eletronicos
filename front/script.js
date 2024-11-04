@@ -5,7 +5,7 @@ const preco = document.getElementById("preco")
 const estoque = document.getElementById("estoque")
 const fornecedor = document.getElementById("fornecedor")
 const imagem = document.getElementById("imagem")
-const formulario = document.getElementById('formulario')
+const formulario = document.getElementById("formulario")
 
 const url = "http://localhost:3000"
 let produtoEditar = null
@@ -67,7 +67,7 @@ formulario.addEventListener("submit", async (e) => {
     console.log("response: ", res)
     console.log(data)
     formulario.reset()
-    buscarPordutos()
+    buscarProdutos()
 
   } catch (error) {
     alert("Erro ao adicionar Produto")
@@ -76,79 +76,82 @@ formulario.addEventListener("submit", async (e) => {
 })
 
 
-let nomeEditar = document.getElementById("nome-editar").value
-let categoriaEditar = document.getElementById("categoria-editar").value
-let descricaoEditar = document.getElementById("descricao-editar").value
-let precoEditar = document.getElementById("preco-editar").value
-let estoqueEditar = document.getElementById("estoque-editar").value
-let fornecedorEditar = document.getElementById("fornecedor-editar").value
-let imagemEditar = document.getElementById("imagem-editar").value
+let nomeEditar = document.getElementById("nome-editar")
+let categoriaEditar = document.getElementById("categoria-editar")
+let descricaoEditar = document.getElementById("descricao-editar")
+let precoEditar = document.getElementById("preco-editar")
+let estoqueEditar = document.getElementById("estoque-editar")
+let fornecedorEditar = document.getElementById("fornecedor-editar")
+let imagemEditar = document.getElementById("imagem-editar")
 const formularioEditar = document.getElementById('formulario-editar')
 
+const divEditar = document.getElementById("div-editar")
 
-async function editar(id) {
-  const divEditar = document.getElementById("div-editar")
-  divEditar.style.display = "flex"
+if (formularioEditar) {
+  formularioEditar.addEventListener("submit", async (e) => {
+    e.preventDefault()
 
-  const btnFechar = document.getElementById("fechar-editar")
-  if (btnFechar) {
-    btnFechar.addEventListener("click", (e) => {
-      divEditar.style.display = "none"
-    })
-  }
-
-  try {
-    const res = await fetch(`${url}/eletronicos/${id}`, {
-      method: "GET",
-    })
-    const produto = await res.json()
-    console.log(produto)
-
-    if (produto) {
-      nomeEditar = produto.nome
-      categoriaEditar = produto.categoria
-      descricaoEditar = produto.descricao
-      precoEditar = produto.preco
-      estoqueEditar = produto.estoque
-      fornecedorEditar = produto.fornecedor
-      imagemEditar = produto.imagem
-    } else {
-      alert("Não foi possível encontrar o produto")
-    }
-    if (formularioEditar) {
-      formularioEditar.addEventListener("submit", async (e) => {
-        e.preventDefault()
-
-        const res = await fetch(`${url}/eletronicos/${id}`, {
+    if(produtoEditar) {
+      try {
+        const res = await fetch(`${url}/eletronicos/${produtoEditar}`, {
           method: "PUT",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({
-            nome: nomeEditar,
-            categoria: categoriaEditar,
-            descricao: descricaoEditar,
-            preco: precoEditar,
-            estoque: estoqueEditar,
-            fornecedor: fornecedorEditar,
-            imagem: imagemEditar
+            nome: nomeEditar.value,
+            categoria: categoriaEditar.value,
+            descricao: descricaoEditar.value,
+            preco: precoEditar.value,
+            estoque: estoqueEditar.value,
+            fornecedor: fornecedorEditar.value,
+            imagem: imagemEditar.value
           })
         })
-        
 
-        const produto = await res.json()
-        if (produto) {
+        if(res.ok) {
           divEditar.style.display = "none"
           buscarProdutos()
         } else {
           alert("Erro ao atualizar dados")
         }
-      })
+      } catch(error) {
+        console.error(error)
+      }
     }
+  })
+}
 
+async function editar(id) {
+  divEditar.style.display = "flex"
+  produtoEditar = id
+
+  const btnFechar = document.getElementById("fechar-editar")
+  if (btnFechar) {
+    btnFechar.addEventListener("click", () => {
+      divEditar.style.display = "none"
+    })
+  }
+
+  try {
+    const res = await fetch(`${url}/eletronicos/${produtoEditar}`, {
+      method: "GET",
+    })
+    const produto = await res.json()
+
+    if (produto) {
+      nomeEditar.value = produto.nome
+      categoriaEditar.value = produto.categoria
+      descricaoEditar.value = produto.descricao
+      precoEditar.value = produto.preco
+      estoqueEditar.value = produto.estoque
+      fornecedorEditar.value = produto.fornecedor
+      imagemEditar.value = produto.imagem
+    } else {
+      alert("Não foi possível encontrar o produto")
+    }
   } catch (error) {
     console.error(error)
   }
 }
-
 
 async function excluir(id) {
   try {

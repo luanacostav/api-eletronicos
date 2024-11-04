@@ -94,8 +94,9 @@ app.put('/eletronicos/:id', async (req, res) => {
     const updProduto = await pool.query(
       `UPDATE produto SET
       nome = $1, categoria = $2, descricao = $3, preco = $4,
-      estoque = $5, fornecedor = $6, imagem = $7`,
-      [nome, categoria, descricao, preco, estoque, fornecedor, imagem]
+      estoque = $5, fornecedor = $6, imagem = $7 
+      WHERE id = $8 RETURNING *`,
+      [nome, categoria, descricao, preco, estoque, fornecedor, imagem, id]
     )
     if (updProduto.rows === 0) {
       res.status(404).json({ message: "Produto não encontrado" })
