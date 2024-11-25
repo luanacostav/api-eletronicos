@@ -1,7 +1,9 @@
+const dotenv = require('dotenv')
+dotenv.config({ path: "./.env.development" });
+
 const express = require('express')
 const cors = require('cors')
 const port = 3000
-// const path = require('path')
 const pg = require('pg')
 const { Pool } = pg
 
@@ -9,16 +11,38 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-const pool = new Pool({
-  user: 'postgres',
-  port: 5432,
-  host: 'localhost',
-  database: 'eletronicos',
-  password: 'Guitar21!'
-})
+const createPool = () => {
+  if(process.env.NODE_ENV === 'production') {
+    return new Pool({
+      connectionString: process.env.DB_URL,
+      ssl: {
+        rejectUnauthorized: false,
+      }
+    })
+  } else {
+    return new Pool({
+      user: process.env.DB_USER,
+      port: process.env.DB_PORT,
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      password: process.env.DB_PASS,
+    })
+  }
+}
+
+const poll = createPool();
+
+const testarConexao = async () => {
+  try {
+    const res = await poll.query("SELECT NOW()");
+    console.log("Conexão bem-sucedida", res.rows[0]);
+  } catch (err) {
+    console.error("error ao conectar com banco de dados", err);
+  }
+};
 
 async function criarTabela() {
-  const tabela = await pool.query(
+  const tabela = await poll.query(
     `CREATE TABLE IF NOT EXISTS produto(
       id SERIAL PRIMARY KEY,
       nome VARCHAR(100) NOT NULL,
@@ -32,11 +56,13 @@ async function criarTabela() {
   )
   console.log('Tabela criada!')
 }
+
+testarConexao()
 // criarTabela()
 
 app.get('/eletronicos', async (req, res) => {
   try {
-    const getAll = await pool.query(
+    const getAll = await poll.query(
       `SELECT * FROM produto`
     )
     console.log(getAll.rows)
@@ -53,7 +79,7 @@ app.post('/eletronicos', async (req, res) => {
     const { nome, categoria, descricao, preco, estoque,
       fornecedor, imagem } = req.body
 
-    const postProduto = await pool.query(
+    const postProduto = await poll.query(
       `INSERT INTO produto (nome, categoria, descricao, preco, estoque, fornecedor, imagem)
       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
       [nome, categoria, descricao, preco, estoque, fornecedor, imagem]
@@ -70,7 +96,7 @@ app.get('/eletronicos/:id', async (req, res) => {
   try {
     const { id } = req.params
 
-    const getProduto = await pool.query(
+    const getProduto = await poll.query(
       `SELECT * FROM produto
       WHERE id = $1`, [id]
     )
@@ -91,7 +117,7 @@ app.put('/eletronicos/:id', async (req, res) => {
     const { nome, categoria, descricao, preco, estoque, 
       fornecedor, imagem } = req.body
 
-    const updProduto = await pool.query(
+    const updProduto = await poll.query(
       `UPDATE produto SET
       nome = $1, categoria = $2, descricao = $3, preco = $4,
       estoque = $5, fornecedor = $6, imagem = $7 
@@ -113,7 +139,7 @@ app.delete('/eletronicos/:id', async (req, res) => {
   try {
     const { id } = req.params
 
-    const dltProduto = await pool.query(
+    const dltProduto = await poll.query(
       `DELETE FROM produto
       WHERE id = $1`, [id]
     )

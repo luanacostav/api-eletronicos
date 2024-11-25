@@ -7,17 +7,87 @@ const fornecedor = document.getElementById("fornecedor")
 const imagem = document.getElementById("imagem")
 const formulario = document.getElementById("formulario")
 
+const divImg = document.getElementById("divImg")
+const imagemIns = document.getElementById("iconImg")
+const btnProdutos = document.getElementById("btnProdutos")
+const btnForms = document.getElementById("btnForms")
+const btnGrafico = document.getElementById("btnGrafico")
+
 const url = "http://localhost:3000"
 let produtoEditar = null
+
+if(imagem) {
+  imagem.addEventListener("input", () => {
+    if(imagem.value) {
+      imagemIns.src = imagem.value
+      imagemIns.style.width = "50%";
+      imagemIns.style.height = "70%";
+      imagemIns.style.boxShadow = "0px 4px 8px rgba(0, 0, 0, 0.2)";
+    } else {
+      imagemIns.src = "/front/assets/img/icon-img.png"
+    }
+  })
+}
+
+if(btnProdutos) {
+  btnProdutos.addEventListener("click", () => {
+    window.location.href = "/front/produtos.html"
+  })
+}
+
+if(btnForms) {
+  btnForms.addEventListener("click", () => {
+    window.location.href = "/front/index.html"
+  })
+}
+
+if(btnGrafico) {
+  btnGrafico.addEventListener("click", () => {
+    window.location.href = "/front/graficos.html"
+  })
+}
+
+let chartProdutos = null
+
+async function atualizarGrafico() {
+  const result = await fetch(`${url}/eletronicos`)
+  const produtos = await result.json()
+
+  const ctx = document.getElementById('myChart')
+  console.log(ctx)
+  
+  const labels = produtos.map(produto => produto.categoria)
+  const data = produtos.map(produto => produto.estoque)
+
+  chartProdutos = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Estoque de Produtos',
+        data: data,
+        backgroundColor: 'rgb(56, 56, 176)',
+        borderColor: 'rgb(56, 56, 176)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  })
+}
 
 // BUSCAR OS PRODUTOS
 async function buscarProdutos() {
   try {
     const result = await fetch(`${url}/eletronicos`)
     const produtos = await result.json()
-    console.log(produtos)
 
-    const tbody = document.getElementById("tabelaProdutos")
+    const tbody = document.getElementById("tbodyProdutos")
     tbody.innerHTML = ""
     produtos.map((produto) => {
       tbody.innerHTML += `
@@ -28,52 +98,60 @@ async function buscarProdutos() {
           <td>${produto.preco}</td>
           <td>${produto.estoque}</td>
           <td>${produto.fornecedor}</td>
-          <td><img src="${produto.imagem}" alt="img-produto" width="200px"></td>
           <td>
-              <button id="btn-editar" onclick="editar(${produto.id})">Editar</button>
-              <button id="btn-excluir" onclick="excluir(${produto.id})">Excluir</button>
+            <div class="img-tabela">
+              <img src="${produto.imagem}" alt="img-produto" width="200px">
+            </div>
+          </td>
+          <td>
+              <button id="btn-editar" class="btn-acao" onclick="editar(${produto.id})">Editar</button>
+              <button id="btn-excluir" class="btn-acao" onclick="excluir(${produto.id})">Excluir</button>
           </td>
         </tr>
       `
     })
 
+    atualizarGrafico()
+
   } catch (error) {
-    alert("Erro na busca de produtos")
     console.error(error)
   }
 }
 
 // ADICIONAR PRODUTOS
-formulario.addEventListener("submit", async (e) => {
-  e.preventDefault()
-
-  try {
-    const res = await fetch(`${url}/eletronicos`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        nome: nome.value,
-        categoria: categoria.value,
-        descricao: descricao.value,
-        preco: preco.value,
-        estoque: estoque.value,
-        fornecedor: fornecedor.value,
-        imagem: imagem.value
+if(formulario) {
+  formulario.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    console.log('Formulário submetido')
+  
+    try {
+      const res = await fetch(`${url}/eletronicos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nome: nome.value,
+          categoria: categoria.value,
+          descricao: descricao.value,
+          preco: preco.value,
+          estoque: estoque.value,
+          fornecedor: fornecedor.value,
+          imagem: imagem.value
+        })
       })
-    })
-    const data = await res.json()
-    console.log("response: ", res)
-    console.log(data)
-    formulario.reset()
-    buscarProdutos()
-
-  } catch (error) {
-    alert("Erro ao adicionar Produto")
-    console.error(error)
-  }
-})
+      const data = await res.json()
+      console.log("response: ", res)
+      console.log(data)
+      formulario.reset()
+      buscarProdutos()
+  
+    } catch (error) {
+      alert("Erro ao adicionar Produto")
+      console.error(error)
+    }
+  })
+}
 
 
 let nomeEditar = document.getElementById("nome-editar")
@@ -169,4 +247,7 @@ async function excluir(id) {
   }
 }
 
-buscarProdutos()
+window.onload = () => {
+  buscarProdutos()
+  atualizarGrafico()
+}

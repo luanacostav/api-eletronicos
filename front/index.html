@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,54 +7,39 @@
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
-<body>
-  <div class="container">
-    <h1>Cadastro de produtos</h1>
-    <div class="forms">
-      <form action="" id="formulario">
-        <input type="text" id="nome" placeholder="Nome:" required>
-        <input type="text" id="categoria" placeholder="Categoria:" required>
-        <textarea name="descricao" id="descricao" placeholder="Descrição:" required></textarea>
-        <input type="number" step="0.01" id="preco" placeholder="Preço:" required>
-        <input type="number" id="estoque" placeholder="Estoque:" required>
-        <input type="text" id="fornecedor" placeholder="Fornecedor:" required>
-        <input type="url" id="imagem" placeholder="Imagem:" required>
-        <button type="submit">Cadastrar</button>
-      </form>
-    </div>
-    <div class="tabelaProdutos">
-      <table>
-        <thead>
-          <tr>
-            <td>Nome</td>
-            <td>Categoria</td>
-            <td>Descrição</td>
-            <td>Preço</td>
-            <td>Estoque</td>
-            <td>Fornecedor</td>
-            <td>Imagem</td>
-            <td>Ações</td>
-          </tr>
-        </thead>
-        <tbody id="tabelaProdutos">
-        </tbody>
-      </table>
-    </div>
-    <div class="div-editar" id="div-editar" style="display: none;">
-      <div class="content">
-        <form action="" id="formulario-editar">
-          <input type="text" id="nome-editar" placeholder="Nome:" required>
-          <input type="text" id="categoria-editar" placeholder="Categoria:" required>
-          <textarea name="descricao" id="descricao-editar" placeholder="Descrição:" required></textarea>
-          <input type="number" step="0.01" id="preco-editar" placeholder="Preço:" required>
-          <input type="number" id="estoque-editar" placeholder="Estoque:" required>
-          <input type="text" id="fornecedor-editar" placeholder="Fornecedor:" required>
-          <input type="url" id="imagem-editar" placeholder="Imagem:" required>
-          <button type="submit">Atualizar Produto</button>
-          <button id="fechar-editar">Fechar</button>
-        </form>
+  <body>
+    <div class="container">
+      <div class="content-form">
+        <div class="titulo">
+          <p>CADASTRO DE PRODUTOS</p>
+        </div>
+        <div class="div-content">
+          <div class="content-imagem">
+            <div class="div-imagem" id="divImg">
+              <img src="/front/assets/img/icon-img.png" alt="icon" id="iconImg">
+            </div>
+            <div class="imagem-p">
+              <p>Insira a imagem correspondente do produto</p>
+            </div>
+          </div>
+          <div class="forms">
+            <form action="" id="formulario">
+              <input type="text" id="nome" placeholder="Nome:" required>
+              <input type="text" id="categoria" placeholder="Categoria:" required>
+              <textarea name="descricao" id="descricao" placeholder="Descrição:" required></textarea>
+              <input type="number" step="0.01" id="preco" placeholder="Preço:" required>
+              <input type="number" id="estoque" placeholder="Estoque:" required>
+              <input type="text" id="fornecedor" placeholder="Fornecedor:" required>
+              <input type="url" id="imagem" placeholder="Imagem:" required>
+              <div class="div-button">
+                <button type="submit">Cadastrar</button>
+                <button type="reset">Limpar</button>
+                <button id="btnProdutos">Produtos ⤍</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
